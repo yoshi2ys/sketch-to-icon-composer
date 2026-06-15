@@ -1,11 +1,12 @@
 {
   "name": "Sketch to Icon Composer",
   "identifier": "dev.yoshi.sketch-to-icon-composer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "icon": "icon.png",
   "description": "Copies each top-level layer of the selected frame to the clipboard as full-frame SVG files, ready to drop into Apple's Icon Composer.",
   "author": "yoshi2ys",
   "homepage": "https://github.com/yoshi2ys/sketch-to-icon-composer",
+  "appcast": "https://github.com/yoshi2ys/sketch-to-icon-composer/releases/latest/download/appcast.json",
   "compatibleVersion": "2026.1",
   "bundleVersion": 1,
   "disableCocoaScriptPreprocessor": true,

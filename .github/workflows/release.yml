@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches manifest version
+        run: |
+          MANIFEST="SketchToIconComposer.sketchplugin/Contents/Sketch/manifest.json"
+          VERSION=$(jq -r .version "$MANIFEST")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest version $VERSION"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Package plugin
+        run: zip -r SketchToIconComposer.sketchplugin.zip SketchToIconComposer.sketchplugin -x "*.DS_Store"
+
+      - name: Generate appcast.json
+        run: |
+          SIZE=$(stat -c%s SketchToIconComposer.sketchplugin.zip)
+          DATE=$(date -u +"%a, %d %b %Y %H:%M:%S +0000")
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/SketchToIconComposer.sketchplugin.zip"
+          jq -n \
+            --arg name "Sketch to Icon Composer" \
+            --arg ver "$VERSION" \
+            --arg url "$URL" \
+            --argjson size "$SIZE" \
+            --arg date "$DATE" \
+            '{itemName: $name, versionID: $ver, downloadURL: $url, downloadFileSize: $size, creationDate: $date}' \
+            > appcast.json
+          cat appcast.json
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            SketchToIconComposer.sketchplugin.zip
+            appcast.json
