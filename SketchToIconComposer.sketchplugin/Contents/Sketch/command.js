@@ -77,9 +77,9 @@ function isExportableChild(layer) {
 // each exportable child reveal only that child and export the duplicate
 // itself, so the SVG viewBox is the frame bounds and the child keeps its
 // position (hidden layers are excluded from exports). Filenames get a
-// zero-padded z-order prefix (0 = frontmost): Icon Composer imports
-// alphabetically and stacks the first file on top, so front-to-back here
-// matches Sketch's stacking order there.
+// zero-padded z-order prefix (0 = backmost): Icon Composer 27 puts the
+// first file at the bottom of the stack, so back-to-front here matches
+// Sketch's stacking order there.
 function exportChildrenAsFullFrameSVGs(iconFrame, exportDir) {
   var dup = iconFrame.duplicate()
   try {
@@ -89,8 +89,8 @@ function exportChildrenAsFullFrameSVGs(iconFrame, exportDir) {
     }
 
     // Pick the children before hiding everything — the filter reads `hidden`.
-    // `dup.layers` is back-to-front; reverse so prefix 0 is the frontmost.
-    var children = dup.layers.filter(isExportableChild).reverse()
+    // `dup.layers` is back-to-front, so prefix 0 is the backmost.
+    var children = dup.layers.filter(isExportableChild)
     var padWidth = String(children.length - 1).length
     dup.layers.forEach(function (layer) {
       layer.hidden = true
